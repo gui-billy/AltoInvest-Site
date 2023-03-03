@@ -121,8 +121,6 @@ __pycache__/
 __localcode
 venv
 env
-siteapps/mt5.py
-mt5.py
 .DS_Store
 local_settings.py
 _local_settings.py
