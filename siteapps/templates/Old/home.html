@@ -1,0 +1,19 @@
+{% load static %}
+{% include 'partials/head.html' %}
+
+
+
+<body>
+    {% include 'partials/header.html' %}
+    <main class="main-content-container">
+        {% include 'partials/search.html' %}
+
+        <div class="image-container">
+            <img src="{% static 'global/images/Logo_AltoInvest.jpg' %}" alt="AltoInvest" width="300">
+        </div>
+    </main>
+
+    {% include 'partials/footer.html' %}
+</body>
+
+</html>
