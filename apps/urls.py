@@ -6,5 +6,5 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),  # Home
-    path('mt5/', views.mt5_view, name='MT5 license'),  # Check MT5 License    
+    path('mt5/', views.mt5_view, name='MT5 license'),  # Check MT5 License
 ]

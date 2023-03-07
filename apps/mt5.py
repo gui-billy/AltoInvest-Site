@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 
 from .models import Clients
 
@@ -9,6 +9,7 @@ def mt5(request):
     if request.method == 'GET':
         data = request.GET.dict()
         if not data:
+            raise Http404('Página Inválida')
             response_data = {"ERRO": 'Dados inválidos'}
             return JsonResponse(response_data, status=400, json_dumps_params={'ensure_ascii': False})  # noqa: E501
         data_tuple = tuple(data.items())
