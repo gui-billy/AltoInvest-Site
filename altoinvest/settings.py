@@ -31,7 +31,8 @@ ALLOWED_HOSTS: list[str] = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://altoinvest.com.br',
-    'https://www.altoinvest.com.br']
+    'https://www.altoinvest.com.br'
+]
 
 
 # Application definition
