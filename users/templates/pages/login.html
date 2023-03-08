@@ -1,0 +1,15 @@
+{% extends 'global/base.html' %}
+
+{% block title %}Login | {% endblock title %}
+
+{% block content %}
+  <div class="form-content">
+    <h2 class="form-title form-title-content">Login</h2>    
+  </div>  
+  <div class="main-content center container">
+    {% include 'global/partials/login_message.html' %}
+  </div>
+  {% include 'global/partials/messages.html' %}
+  {% include 'global/partials/form.html' %}
+  
+{% endblock content %}

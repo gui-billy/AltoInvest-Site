@@ -109,6 +109,13 @@ h6 {
     padding: 2rem;
 }
 
+.center-line {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+}
+
 /* FORM */
 
 .form-content {
@@ -246,6 +253,20 @@ h6 {
     background: rgba(0, 0, 0, .1);
 }
 
+.inline-form {
+    display: inline;    
+  }
+  
+.plaintext-button {
+    display: inline;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-primary);
+    font-size: 1.6rem;
+  }
+  
+
 /* Messages */
 .messages-container {
     display: flex;
@@ -297,6 +318,10 @@ h6 {
     color: var(--color-debug-dark);
   }
 
+/* Authors */
+.login-message {
+    margin: 1rem 0;
+  }
 
 @media (max-width: 800px) {
     .form-content-grid {

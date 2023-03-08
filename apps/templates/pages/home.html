@@ -5,10 +5,16 @@
 
 {% block title %}{% endblock title %}
 
-{% block content %}
-{% include 'global/partials/search.html' %}
-<div class="image-container">
-    {% comment %} <img src="{% static 'global/images/Logo_AltoInvest.jpg' %}" alt="AltoInvest" width="300">     {% endcomment %}
-    <img src="{{ robot.cover.url }}" alt="Temporário">
+<div class="main-content center">
+    {% block content %}
+        <div class="center">
+            {% include 'global/partials/search.html' %}
+        </div>
+    
+        <div class="image-container">
+            {% comment %} <img src="{% static 'global/images/Logo_AltoInvest.jpg' %}" alt="AltoInvest" width="300">     {% endcomment %}
+            <img src="{{ robot.cover.url }}" alt="Temporário">
+        </div>
+    {% endblock content %}
 </div>
-{% endblock content %}
+

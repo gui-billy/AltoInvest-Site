@@ -144,5 +144,22 @@ class UserRegisterFormIntegrationTest(DjangoTestCase):
         response = self.client.post(url, data=self.form_data, follow=True)
 
         msg = 'E-mail já cadastrado'
+
         self.assertIn(msg, response.context['form'].errors.get('email'))
         self.assertIn(msg, response.content.decode('utf-8'))
+
+    def test_author_created_can_login(self):
+        url = reverse('users:create')
+
+        self.form_data['username'] = 'testuser'
+        self.form_data['password'] = '@A123abc123'
+        self.form_data['password2'] = '@A123abc123'
+
+        self.client.post(url, data=self.form_data, follow=True)
+
+        is_authenticated = self.client.login(
+            username='testuser',
+            password='@A123abc123'  # Use the updated password
+        )
+
+        self.assertTrue(is_authenticated)
