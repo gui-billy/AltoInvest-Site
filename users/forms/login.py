@@ -17,6 +17,4 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(attrs={
             'placeholder': 'Digite sua senha'
         }),
-
-
     )

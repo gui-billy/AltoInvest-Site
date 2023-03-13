@@ -1,7 +1,8 @@
-<div class="main-content container">
-    <form action="{{ form_action }}" method="POST">
-      {% csrf_token %}
-      <div class="form-content form-content-grid">
+<div class="center">
+  <form action="{{ form_action }}" method="POST">
+    {% csrf_token %}
+    <div class="space">
+      <div class="form-content form-content-grid">        
         {% for field in form %}
           <div class="form-group">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -15,20 +16,19 @@
           </div>
         {% endfor %}
       </div>
-      
       {% if form.errors %}
-        <div class="form-content form-content-grid">
-          <div class="form-group">
-            <div class="message message-error center">
-              Preenchimento incorreto. 
-              Verifique e envie novamente.
-            </div>
-          </div>
+        <div class="center">        
+          <div class="messages-container message message-error">
+            Preenchimento incorreto. 
+            Verifique e envie novamente.
+          </div>         
         </div>
-      {% endif %}
-
-      <div class="form-group center">
-        <button class="form-group-button" type="submit">Enviar</button>
+      {% endif %}  
+      <div class="g-recaptcha main-captcha" data-sitekey="6LeKyO0kAAAAADBS622otvaNQkAp9jzewsZ1j841">
       </div>
-    </form>
-  </div>
+      <div class="form-group center">        
+        <button class="form-group-button" type="submit">Enviar</button>
+      </div>  
+    </div>
+  </form>
+</div>

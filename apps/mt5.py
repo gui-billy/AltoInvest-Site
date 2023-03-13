@@ -10,8 +10,6 @@ def mt5(request):
         data = request.GET.dict()
         if not data:
             raise Http404('Página Inválida')
-            response_data = {"ERRO": 'Dados inválidos'}
-            return JsonResponse(response_data, status=400, json_dumps_params={'ensure_ascii': False})  # noqa: E501
         data_tuple = tuple(data.items())
 
         clients = Clients.objects.all().values('broker', 'account', 'exp_date')

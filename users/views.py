@@ -34,7 +34,7 @@ def register_create(request):
         if 'register_form_data' in request.session:
             del request.session['register_form_data']
             return redirect(reverse('users:login'))
-        return redirect('users:register')
+        return redirect('users:login')
     else:
         request.session['register_form_data'] = request.POST
         return redirect('users:register')

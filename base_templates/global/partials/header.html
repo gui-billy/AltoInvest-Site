@@ -1,11 +1,14 @@
 {% load static %}
-<header class="main-header">
-    <div>
-        <h1>
-            <a class="main-logo" href="/">
-                <img class="main-logo-icon" src="{% static 'global/images/Menu-AltoInvest.png' %}" alt="Logo" width="100">
-                <span>{{ page_name }} </span>
+<header class="main-content container">
+    <div class="main-header">        
+        <a class="main-logo" href="/">
+            <img class="main-logo-icon" src="{% static 'global/images/LogoH_Altoinest.png' %}" alt="Logo">                
+        </a>        
+        <div class="menu">
+            <a href="/users/login">
+                <i class="fa-regular fa-user user-buttom"></i>
             </a>
-        </h1>
+            <span class="menu-buttom">Menu</span> 
+        </div>                  
     </div>
 </header>

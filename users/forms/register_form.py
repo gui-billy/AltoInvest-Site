@@ -1,3 +1,4 @@
+import requests
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -72,6 +73,32 @@ class RegisterForm(forms.ModelForm):
         ]
 
     def clean(self):
+        raw_data = self.data
+        recaptcha_response = raw_data.get('g-recaptcha-response')
+
+        # Make a POST request to the Google reCAPTCHA API
+        recaptcha_request = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': '6LeKyO0kAAAAAFPR72m3S8nBe-rbfR7gK9ggaDpu',
+                'response': recaptcha_response
+            }
+        )
+
+        # Get the response data in JSON format
+        recaptcha_result = recaptcha_request.json()
+
+        # Check if the reCAPTCHA was successful
+        if not recaptcha_result.get('success'):
+            captcha_error = ValidationError(
+                'Recaptcha Erro',
+                code='invalid'
+            )
+            raise ValidationError({
+                'password': captcha_error,
+                'password2': [captcha_error,],
+            })
+
         cleaned_data = super().clean()
 
         password = cleaned_data.get('password')
@@ -84,9 +111,7 @@ class RegisterForm(forms.ModelForm):
             )
             raise ValidationError({
                 'password': password_confirmation_error,
-                'password2': [
-                    password_confirmation_error,
-                ],
+                'password2': [password_confirmation_error,],
             })
 
     def clean_email(self):

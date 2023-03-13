@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
-
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <head>
     {% include 'global/partials/head.html' %}
     <title>{% block title %}{% endblock title %} AltoInvest</title>
@@ -9,11 +9,9 @@
 
 <body>
     {% include 'global/partials/header.html' %}
-    {% block content %}{% endblock content %}
     <main class="main-content container">
-        
+        {% block content %}{% endblock content %}
     </main>
-
     {% include 'global/partials/footer.html' %}
 </body>
 

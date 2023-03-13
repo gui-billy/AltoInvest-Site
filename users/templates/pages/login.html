@@ -4,12 +4,17 @@
 
 {% block content %}
   <div class="form-content">
-    <h2 class="form-title form-title-content">Login</h2>    
-  </div>  
+    <h2 class="form-title form-title-content">Entrar</h2> 
+    <h3 class="subtitle">
+      <a href="/users/register">Crie a sua conta</a>
+    </h3>    
+  </div>       
   <div class="main-content center container">
     {% include 'global/partials/login_message.html' %}
   </div>
   {% include 'global/partials/messages.html' %}
-  {% include 'global/partials/form.html' %}
+  {% if not user.is_authenticated %}
+    {% include 'global/partials/form.html' %}
+  {% endif %}
   
 {% endblock content %}

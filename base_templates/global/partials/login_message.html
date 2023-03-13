@@ -5,7 +5,7 @@
     <form class="inline-form" action="{% url 'users:logout' %}" method='POST'>
       {% csrf_token %}
       <input type="hidden" name="username" value="{{ request.user.username }}">
-      <button class="plaintext-button" type="submit">Clique aqui</button>  para sair.
+      <div class="center"><button class="plaintext-button" type="submit">Clique aqui </button>&nbsp;para sair.</div>
     </form>
   </div>
 {% endif %}

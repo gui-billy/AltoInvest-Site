@@ -5,15 +5,14 @@
 
 {% block title %}{% endblock title %}
 
-<div class="main-content center">
+<div class="main-content container center">
     {% block content %}
-        <div class="center">
-            {% include 'global/partials/search.html' %}
-        </div>
-    
         <div class="image-container">
-            {% comment %} <img src="{% static 'global/images/Logo_AltoInvest.jpg' %}" alt="AltoInvest" width="300">     {% endcomment %}
-            <img src="{{ robot.cover.url }}" alt="Temporário">
+            <h1 class="main-text">Automatizando de forma rápida e fácil suas estratégias para o mercado financeiro</h1>
+            <h2 class="link-container">
+                <a href="algotrading">Automatize a sua</a>
+            </h2>
+            <img src="{% static 'global/images/Chart-bw.jpg' %}" alt="Bckgrd">
         </div>
     {% endblock content %}
 </div>

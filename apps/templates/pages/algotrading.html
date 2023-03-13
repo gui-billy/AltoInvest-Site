@@ -2,121 +2,27 @@
 {% load static %}
 
 
-
 {% block title %}{% endblock title %}
 
-{% block content %}
-<label for="stoploss-dropdown">Adicionar Stoploss:</label>
-    <select id="stoploss-dropdown">
-        {% for stoploss in stoploss_list %}
-            <option>{{ stoploss.name }}</option>
-        {% endfor %}
-    </select>
-    <div class="table">
-        <div class="row header">
-            <div class="cell">Columm 1</div>
-            <div class="cell">Column 2</div>
-            <div class="cell">Column 3</div>
+<div class="main-content container">
+    {% block content %}
+    <form method="post">
+
+        {% csrf_token %}
+        <div class="center">
+          <p>Escolha a Plataforma que o robô irá ser utilizado:</p>
         </div>
-        <div class="row">
-            <div class="cell">Nome</div>
-            <div class="cell"><input type="text" name="nome" style="width: 100%; box-sizing: border-box;"></div>
+
+        <div class="form-group center">
+            <div class="form-group">            
+            {{ form.platform }}
+            </div>        
+        </div>   
+
+        <div class="form-group center">
+            <button class="form-group-button" type="submit">Próximo</button>
         </div>
-        <div class="row">
-            <div class="cell">Descrição</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Plataforma</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Tipo de Conta</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Tipo de Mercado</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Tipo de Sistema</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Volume/Lote</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Stoploss</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Gain/TakeProfit</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Horario de Negociação</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-        <div class="row">
-            <div class="cell">Horario de Encerramento</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-         <div class="row">
-            <div class="cell">Indicadores</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-         <div class="row">
-            <div class="cell">Timeframe</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-         <div class="row">
-            <div class="cell">Numero Mágico</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-         <div class="row">
-            <div class="cell">Tipo de Ordem</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-            <div class="row">
-            <div class="cell">Breakeven</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-            <div class="row">
-            <div class="cell">Trailing</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-            <div class="row">
-            <div class="cell">Meta</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-            <div class="row">
-            <div class="cell">Setup</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-            <div class="row">
-            <div class="cell">Imagens</div>
-            <div class="cell">Content 2</div>
-            <div class="cell">Content 3</div>
-        </div>
-    </div>
-        
-{% endblock content %}
+
+      </form>
+    {% endblock content %}
+</div>
