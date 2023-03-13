@@ -1,3 +1,5 @@
+import os
+
 import requests
 from django import forms
 from django.contrib.auth.models import User
@@ -80,7 +82,7 @@ class RegisterForm(forms.ModelForm):
         recaptcha_request = requests.post(
             'https://www.google.com/recaptcha/api/siteverify',
             data={
-                'secret': '6LeKyO0kAAAAAFPR72m3S8nBe-rbfR7gK9ggaDpu',
+                'secret': os.environ.get('RECAPTCHA_SECRET_KEY'),
                 'response': recaptcha_response
             }
         )
