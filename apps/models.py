@@ -17,7 +17,7 @@ class Clients(models.Model):
 #     platform = models.CharField(max_length=65)
 #     market = models.CharField(max_length=65)
 #     account_type = models.CharField(max_length=65)
-#     stoploss = models.CharField(max_length=65)
+#     stoploss = models.CharField(max_length=250)
 #     gain = models.CharField(max_length=65)
 #     volume = models.CharField(max_length=65)
 #     time = models.CharField(max_length=65)

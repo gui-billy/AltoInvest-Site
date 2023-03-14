@@ -1,0 +1,16 @@
+<form method="post">
+
+    {% csrf_token %}
+    <div class="center">
+      <p>Escolha a Plataforma que o robô irá ser utilizado:</p>
+    </div>
+
+    <div class="center list">
+        <div>            
+          <p class="list-text">Plataforma: </p> 
+        </div> 
+        <div class="list-group drop-down">            
+          {{ form.platform }}
+        </div>        
+    </div>   
+</form>

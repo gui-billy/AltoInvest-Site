@@ -1,0 +1,16 @@
+<form method="post">
+
+    {% csrf_token %}
+    <div class="center">
+      <p>Escolha o tipo de Stop-Gain (Take Profit):</p>
+    </div>
+
+    <div class="center list">
+        <div>            
+          <p class="list-text">Stop-Gain (TakeProfit): </p> 
+        </div> 
+        <div class="list-group drop-down">            
+          {{ form.gain }}
+        </div>        
+    </div>   
+</form>

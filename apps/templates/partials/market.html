@@ -1,0 +1,16 @@
+<form method="post">
+
+    {% csrf_token %}
+    <div class="center">
+      <p>Escolha o tipo de mercado:</p>
+    </div>
+
+    <div class="center list">
+        <div>            
+          <p class="list-text">Mercado: </p> 
+        </div> 
+        <div class="list-group drop-down">            
+          {{ form.market }}
+        </div>        
+    </div>   
+</form>

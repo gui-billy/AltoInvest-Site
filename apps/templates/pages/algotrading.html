@@ -5,24 +5,23 @@
 {% block title %}{% endblock title %}
 
 <div class="main-content container">
-    {% block content %}
-    <form method="post">
-
-        {% csrf_token %}
-        <div class="center">
-          <p>Escolha a Plataforma que o robô irá ser utilizado:</p>
-        </div>
-
-        <div class="form-group center">
-            <div class="form-group">            
-            {{ form.platform }}
-            </div>        
-        </div>   
-
-        <div class="form-group center">
-            <button class="form-group-button" type="submit">Próximo</button>
-        </div>
-
-      </form>
-    {% endblock content %}
+  {% block content %}
+    {% include partial_template %}
+    <div class="form-group center">
+      {% if counter == 0 %}
+        <a href="?counter={{ counter|add:1 }}"><button class="form-group form-group-button" type="button">Iniciar</button></a> 
+      {% endif %}
+      {% if counter > 0 and counter < num_templates %}
+        <a href="?counter={{ counter|add:-1 }}"><button class="fa-solid fa-circle-chevron-left previous-button" type="button"></button></a>
+        <a href="?counter={{ counter|add:1 }}"><button class="fa-solid fa-circle-chevron-right next-button" type="button"></button></a>   
+      {% endif %}     
+      {% if counter == num_templates %}
+        <a href="?counter={{ counter|add:-1 }}"><button class="fa-solid fa-circle-chevron-left previous-button" type="button"></button></a>
+        <div>
+          <a href="?counter={{ counter|add:1 }}"><button class="form-group form-group-button" type="button">Enviar</button></a> 
+        </div>        
+      {% endif %}      
+    </div>        
+    
+  {% endblock content %}    
 </div>

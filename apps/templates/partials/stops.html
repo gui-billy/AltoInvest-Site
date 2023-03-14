@@ -1,0 +1,122 @@
+<form method="post">
+    {% csrf_token %}
+    <div class="center list-title">
+        <p style="margin-left: 0.8rem;">Selecione o sistema de <span style="color: red;">Stop-Loss</span> que o Robô irá utilizar:</p>
+    </div>
+    <div class="center list">
+        <div class="list-group drop-down">
+            {{ form.stops }}
+        </div>
+        <button type="button" id="add-stops-btn" class="btn btn-primary">Adicionar</button>
+    </div>
+    <div class="center">
+        <div class="text-box">
+            <label id="custom-stop-label" for="{{ form.custom_stop.id_for_label }}" class="center-label">Personalizado:</label>
+            {{ form.custom_stop }}
+        </div>
+    </div>
+    <div class="center">
+        <ul id="selected-stops">
+            <!-- Selected stops will be displayed here -->
+        </ul>
+    </div>    
+</form>
+
+<div class="center">
+    <button type="button" id="info-btn">Mais Informações</button>
+</div>
+<div class="center" id="info-content" style="display:none;">
+    <div class="help-text-algo">
+        <div class="text-information"><span style="font-weight: bold;">
+            Pontos</span> - Limita as perdas estabelecendo um limite pré-determinado em pontos a partir do preço de entrada. 
+            Por exemplo: a posição é fechada automaticamente caso o mercado ande contra 100 pontos do seu preço de entrada.</div>
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Financeiro</span> - Limita as perdas estabelecendo um limite financeiro a partir do preço de entrada. 
+            Por exemplo: a posição é fechada automaticamente caso sua posição esteja perdendo 50,00 reais.</div> 
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Variação (%)</span> - Limita as perdas estabelecendo um limite de variação em relação ao seu preço de entrada. 
+            Por exemplo: a posição é fechada automaticamente caso seu preço de entrada ultrapassar uma variação de 2%.</div>  
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Personalizado</span> - Limita as perdas seguindo as condições estabelecidas pelo usuário. 
+            Por exemplo: valor do stop-loss será em pontos e ajustado de acordo com o valor do indicador "ATR", no momento da abertura da posição.</div>
+    </div>
+</div>
+
+<script>
+    // Add JavaScript code to handle the "Mais Informações" and "Menos Informações" button
+    $(document).ready(function() {
+        $('#info-btn').click(function() {
+            if ($('#info-content').is(':visible')) {
+                $('#info-content').hide();
+                $(this).text('Mais Informações');
+            } else {
+                $('#info-content').show();
+                $(this).text('Menos Informações');
+            }
+        });
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(function() {
+        // hide custom field initially
+        $('#id_custom_stop').hide();
+        $('#custom-stop-label').hide();
+
+        let userChoices = new Set();
+
+        // Add the selected stop when "Adicionar" button is clicked
+        $('#add-stops-btn').click(function() {
+            const selectedStop = $('#id_stops option:selected');
+            const stopText = selectedStop.text();
+            const stopValue = selectedStop.val();
+
+            if (stopValue === 'Personalizado') {
+                const customValue = $('#id_custom_stop').val().trim();
+                if (customValue !== '' && !userChoices.has(customValue)) {
+                    userChoices.add(customValue);
+                    const listItem = $('<li class="selected-stop" data-value="' + customValue + '">' + customValue + ' <button class="btn btn-sm btn-danger remove-stop">X</button></li>');
+                    $('#selected-stops').append(listItem);
+                }
+            } else if (stopValue !== '' && !userChoices.has(stopValue)) {
+                userChoices.add(stopValue);
+                const listItem = $('<li class="selected-stop" data-value="' + stopValue + '">' + stopText + ' <button class="btn btn-sm btn-danger remove-stop">X</button></li>');
+                $('#selected-stops').append(listItem);
+            }
+
+            // Reset the form.stops field to the first value
+            $('#id_stops').val($('#id_stops option:first').val());
+
+            // Hide the custom field if it was previously shown
+            $('#id_custom_stop').hide();
+            $('#custom-stop-label').hide();
+        });
+
+        // Handle the click event for the "X" button to remove items from the list
+        $(document).on('click', '.remove-stop', function() {
+            const listItem = $(this).closest('li');
+            const stopValue = listItem.attr('data-value');
+            userChoices.delete(stopValue);
+            listItem.remove();
+
+            // Update the stoploss field with the updated comma-separated string of the user's choices
+            $('#id_stoploss').val(Array.from(userChoices).join(','));
+        });
+
+        // show custom field when "Personalizado" is selected
+        $('#id_stops').change(function() {
+            if ($(this).val() == 'Personalizado') {
+                $('#id_custom_stop').show();
+                $('#custom-stop-label').show();
+            } else {
+                $('#id_custom_stop').hide();
+                $('#custom-stop-label').hide();
+            }
+        });
+    });
+</script>
