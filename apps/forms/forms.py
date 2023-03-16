@@ -1,6 +1,10 @@
 from django import forms
 
 
+class NameForm(forms.Form):
+    algo_name = forms.CharField(max_length=65)
+
+
 class PlatformForm(forms.Form):
     platform_choices = (
         ('MT5', 'MT5'),
@@ -43,4 +47,4 @@ class GainForm(forms.Form):
         ('Variação (%)', 'Variação (%)'),
         ('Personalizado', 'Personalizado'),
     )
-    gain = forms.ChoiceField(choices=gain_choices)
+    gains = forms.ChoiceField(choices=gain_choices)

@@ -1,16 +1,122 @@
 <form method="post">
-
-    {% csrf_token %}
-    <div class="center">
-      <p>Escolha o tipo de Stop-Gain (Take Profit):</p>
-    </div>
-
-    <div class="center list">
-        <div>            
-          <p class="list-text">Stop-Gain (TakeProfit): </p> 
-        </div> 
-        <div class="list-group drop-down">            
-          {{ form.gain }}
-        </div>        
-    </div>   
+  {% csrf_token %}
+  <div class="algotrading-content list-title">
+      <p style="margin-left: 0.8rem;">Selecione o sistema de &nbsp;<span class="list-title-mark">STOP-GAIN</span>&nbsp; que o Robô 
+        <span class="main-logo"> {{ algo_name }}</span> irá utilizar:</p>
+  </div>
+  <div class="algotrading-content">
+      <div class="select-group drop-down">
+          {{ form.gains }}
+      </div>
+      <button type="button" id="add-gains-btn" class="btn btn-primary">Adicionar</button>
+  </div>
+  <div class="algotrading-content">
+      <div class="text-box">
+          <label id="custom-gain-label" for="{{ form.custom_gain.id_for_label }}" class="center-label">Personalizado:</label>
+          {{ form.custom_gain }}
+      </div>
+  </div>
+  <div class="algotrading-content">
+      <ul id="selected-gains" class="selected-stop">
+          <!-- Selected gains will be displayed here -->
+      </ul>
+  </div>    
 </form>
+
+<div class="algotrading-content">
+  <button type="button" id="info-btn" class="info-buttom">Mais Informações</button>
+</div>
+<div class="algotrading-content" id="info-content" style="display:none;">
+  <div class="help-text-algo">
+      <!-- Update the text information to describe the stop-gain functionality -->
+      <div class="text-information"><span style="font-weight: bold;">
+          Pontos</span> - Limita os ganhos estabelecendo um limite pré-determinado em pontos a partir do preço de entrada. 
+          Por exemplo: a posição é fechada automaticamente caso o mercado ande a favor 100 pontos do seu preço de entrada.</div>
+      <hr>
+      <div class="text-information"><span style="font-weight: bold;">
+          Financeiro</span> - Limita os ganhos estabelecendo um limite financeiro a partir do preço de entrada. 
+          Por exemplo: a posição é fechada automaticamente caso sua posição esteja ganhando 50,00 reais.</div> 
+      <hr>
+      <div class="text-information"><span style="font-weight: bold;">
+          Variação (%)</span> - Limita os ganhos estabelecendo um limite de variação em relação ao seu preço de entrada. 
+          Por exemplo: a posição é fechada automaticamente caso seu preço de entrada variar 2% a favor.</div>  
+      <hr>
+      <div class="text-information"><span style="font-weight: bold;">
+          Personalizado</span> - Limita os ganhos seguindo as condições estabelecidas pelo usuário. 
+          Por exemplo: valor do stop-gain será em pontos e ajustado de acordo com o valor do indicador "ATR", no momento da abertura da posição.</div>
+  </div>
+</div>
+
+<script>
+  // Add JavaScript code to handle the "Mais Informações" and "Menos Informações" button
+  $(document).ready(function() {
+      $('#info-btn').click(function() {
+          if ($('#info-content').is(':visible')) {
+              $('#info-content').hide();
+              $(this).text('Mais Informações');
+          } else {
+              $('#info-content').show();
+              $(this).text('Menos Informações');
+          }
+      });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+    // hide custom field initially
+    $('#id_custom_gain').hide();
+    $('#custom-gain-label').hide();
+
+    let userChoices = new Set();
+
+    // Add the selected gain when "Adicionar" button is clicked
+    $('#add-gains-btn').click(function() {
+        const selectedGain = $('#id_gains option:selected');
+        const gainText = selectedGain.text();
+        const gainValue = selectedGain.val();
+
+        if (gainValue === 'Personalizado') {
+            const customValue = $('#id_custom_gain').val().trim();
+            if (customValue !== '' && !userChoices.has(customValue)) {
+                userChoices.add(customValue);
+                const listItem = $('<li class="selected-gain" data-value="' + customValue + '">' + customValue + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+                $('#selected-gains').append(listItem);
+            }
+        } else if (gainValue !== '' && !userChoices.has(gainValue)) {
+            userChoices.add(gainValue);
+            const listItem = $('<li class="selected-gain" data-value="' + gainValue + '">' + gainText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+            $('#selected-gains').append(listItem);
+        }
+
+        // Reset the form.gains field to the first value
+        $('#id_gains').val($('#id_gains option:first').val());
+
+        // Hide the custom field if it was previously shown
+        $('#id_custom_gain').hide();
+        $('#custom-gain-label').hide();
+    });
+
+    // Handle the click event for the "X" button to remove items from the list
+    $(document).on('click', '.remove-stop', function() {
+        const listItem = $(this).closest('li');
+        const gainValue = listItem.attr('data-value');
+        userChoices.delete(gainValue);
+        listItem.remove();
+
+        // Update the stopgain field with the updated comma-separated string of the user's choices
+        $('#id_stopgain').val(Array.from(userChoices).join(','));
+    });
+    
+    // show custom field when "Personalizado" is selected
+    $('#id_gains').change(function() {
+      if ($(this).val() == 'Personalizado') {
+          $('#id_custom_gain').show();
+          $('#custom-gain-label').show();
+      } else {
+          $('#id_custom_gain').hide();
+          $('#custom-gain-label').hide();
+      }
+  });
+});
+</script>

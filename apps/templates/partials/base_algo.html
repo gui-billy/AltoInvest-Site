@@ -1,10 +1,29 @@
 <form method="post">
-
-    {% csrf_token %}
-    <div class="center">
-      <p>Utilizar algoritmos no mercado de ações e futuros traz inúmeros benefícios aos investidores, como maior precisão e eficiência nas operações. Essas ferramentas possibilitam a execução de estratégias avançadas e processam grandes volumes de dados em tempo real, identificando oportunidades únicas. Os algoritmos eliminam fatores emocionais na tomada de decisões e promovem a diversificação da carteira, minimizando riscos e otimizando os retornos. Ao adotar algoritmos, os investidores garantem uma abordagem mais eficaz e bem-sucedida nas negociações.</p>
-    </div>
-    <div class="center">
-      <p>Para começar digite o nome do robô e aperte o botão "Iniciar" abaixo</p>
-    </div>      
+  {% csrf_token %}
+  <div>
+    <div class="algotrading-content">
+      <p class="submain-text">CRIE O SEU ROBÔ ALGOTRADING</p>
+    </div> 
+    <div class="algotrading-content">
+      <h2 class="essay">
+        Os algoritmos de mercado financeiro (robô algotrading) oferecem praticidade e eficiência,  
+        executando estratégias avançadas e processamento de dados em tempo real. 
+        Eles eliminam fatores emocionais, minimizam riscos e otimizam retornos.
+      </h2>
+    </div>  
+  </div>
+  <div class="algotrading-content">
+    <p class="subessay">Insira o nome e aperte "Iniciar" para solicitar o orçamento:</p>
+  </div>   
+  <div class="request">
+    <div class="blank-box">
+      <div class="request-label">
+        <p>Robô: </p>
+        <input type="text" name="algo_name" placeholder="Ex.: Cruzamento de médias" value="{{ algo_name }}">           
+      </div>
+      <div class="request-button">
+        <button class="form-group-button" type="submit" name="submit">Iniciar</button> 
+      </div>                   
+    </div>  
+  </div>
 </form>

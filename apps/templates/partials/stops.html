@@ -1,31 +1,32 @@
 <form method="post">
     {% csrf_token %}
-    <div class="center list-title">
-        <p style="margin-left: 0.8rem;">Selecione o sistema de <span style="color: red;">Stop-Loss</span> que o Robô irá utilizar:</p>
+    <div class="algotrading-content list-title">
+        <p style="margin-left: 0.8rem;">Selecione o sistema de &nbsp;<span class="list-title-mark">STOP-LOSS</span>&nbsp; que o Robô 
+            <span class="main-logo"> {{ algo_name }}</span> irá utilizar:</p>
     </div>
-    <div class="center list">
-        <div class="list-group drop-down">
+    <div class="algotrading-content">
+        <div class="select-group drop-down">
             {{ form.stops }}
         </div>
         <button type="button" id="add-stops-btn" class="btn btn-primary">Adicionar</button>
     </div>
-    <div class="center">
+    <div class="algotrading-content">
         <div class="text-box">
             <label id="custom-stop-label" for="{{ form.custom_stop.id_for_label }}" class="center-label">Personalizado:</label>
             {{ form.custom_stop }}
         </div>
     </div>
-    <div class="center">
-        <ul id="selected-stops">
+    <div class="algotrading-content">
+        <ul id="selected-stops" class="selected-stop">
             <!-- Selected stops will be displayed here -->
         </ul>
     </div>    
 </form>
 
-<div class="center">
-    <button type="button" id="info-btn">Mais Informações</button>
+<div class="algotrading-content">
+    <button type="button" id="info-btn" class="info-buttom">Mais Informações</button>
 </div>
-<div class="center" id="info-content" style="display:none;">
+<div class="algotrading-content" id="info-content" style="display:none;">
     <div class="help-text-algo">
         <div class="text-information"><span style="font-weight: bold;">
             Pontos</span> - Limita as perdas estabelecendo um limite pré-determinado em pontos a partir do preço de entrada. 
@@ -80,12 +81,12 @@
                 const customValue = $('#id_custom_stop').val().trim();
                 if (customValue !== '' && !userChoices.has(customValue)) {
                     userChoices.add(customValue);
-                    const listItem = $('<li class="selected-stop" data-value="' + customValue + '">' + customValue + ' <button class="btn btn-sm btn-danger remove-stop">X</button></li>');
+                    const listItem = $('<li class="selected-stop" data-value="' + customValue + '">' + customValue + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
                     $('#selected-stops').append(listItem);
                 }
             } else if (stopValue !== '' && !userChoices.has(stopValue)) {
                 userChoices.add(stopValue);
-                const listItem = $('<li class="selected-stop" data-value="' + stopValue + '">' + stopText + ' <button class="btn btn-sm btn-danger remove-stop">X</button></li>');
+                const listItem = $('<li class="selected-stop" data-value="' + stopValue + '">' + stopText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
                 $('#selected-stops').append(listItem);
             }
 
