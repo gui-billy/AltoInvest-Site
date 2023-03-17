@@ -1,16 +1,121 @@
 <form method="post">
-
-    {% csrf_token %}
-    <div class="algotrading-content">
-      <p>Escolha o tipo de mercado:</p>
-    </div>
-
-    <div class="algotrading-content list">
-        <div>            
-          <p class="list-text">Mercado: </p> 
-        </div> 
-        <div class="list-group drop-down">            
+  {% csrf_token %}
+  {% autoescape off %}
+  <input type="hidden" id="initial-market-type" value="{{ market_type }}">
+  <input type="hidden" name="selected_markets" id="id_selected_markets" value="{{ market_type }}" />
+  {% endautoescape %}
+  <input type="hidden" name="market_type" id="id_market_type" value="" />
+  <div class="algotrading-content list-title">
+      <p style="margin-left: 0.8rem;">Selecione o &nbsp;<span class="list-title-mark">Mercado</span>&nbsp; em que o Robô
+          <span class="main-logo"> {{ algo_name }}</span> irá realizar suas operações:</p>
+  </div>
+  <div class="algotrading-content">
+      <div class="select-group drop-down">
           {{ form.market }}
-        </div>        
-    </div>   
+      </div>
+      <button type="button" id="market-btn" class="btn btn-primary">Adicionar</button>
+  </div>  
+  <div class="algotrading-content">
+    <ul id="selected-markets" class="selected-stop font-change">
+        {% for market in selected_markets %}
+            {% if market and market != '' %}
+                <li class="selected-stop" data-value="{{ market }}">
+                    {{ market }} <button class="btn-sm btn-danger remove-stop">X</button>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
 </form>
+
+<div class="algotrading-content">
+  <button type="button" id="info-btn" class="info-buttom">Mais Informações</button>
+</div>
+<div class="algotrading-content" id="info-content" style="display:none;">
+  <div class="help-text-algo">
+      <div class="text-information"><span style="font-weight: bold;">
+          B3</span> - é a principal bolsa de valores do Brasil, onde são 
+          realizadas negociações de ações, títulos e contratos futuros.
+          Diversas corretoras oferecem aos investidores, acesso direto ao mercado financeiro através da B3.</div>
+      <hr>
+      <div class="text-information"><span style="font-weight: bold;">
+          Forex</span> - é um mercado global descentralizado, onde são negociados pares de moedas. 
+          É o maior mercado financeiro do mundo em termos de volume de negociação diária, e funciona 24 horas por dia, 
+          5 dias por semana. As principais vantagens de operar no mercado forex são a alta liquidez, 
+          a possibilidade de alavancagem e a oportunidade de negociar ativos de várias partes do mundo.</div>           
+  </div>
+</div>
+
+<script>
+  // Add JavaScript code to handle the "Mais Informações" and "Menos Informações" button
+  $(document).ready(function() {
+      $('#info-btn').click(function() {
+          if ($('#info-content').is(':visible')) {
+              $('#info-content').hide();
+              $(this).text('Mais Informações');
+          } else {
+              $('#info-content').show();
+              $(this).text('Menos Informações');
+          }
+      });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+    let initialMarkets = JSON.parse('{{ market_type|safe }}')
+        .filter(market => market && market.trim() !== '');
+    let userChoices = new Set(initialMarkets);
+
+    // Initialize the list of selected markets
+    userChoices.forEach(function(marketValue) {
+        if (marketValue) {
+            const marketText = $('#id_market option[value="' + marketValue + '"]').text();
+            const listItem = $('<li class="selected-stop" data-value="' + marketValue + '">' + marketText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+            $('#selected-markets').append(listItem);
+        }
+    });
+
+    // Update the hidden input fields with the initial values
+    const initialSelectedMarkets = Array.from(userChoices).join(',');
+    $('#id_selected_markets').val(initialSelectedMarkets);
+    $('#id_market_type').val(initialSelectedMarkets);
+    
+    // Add the selected market when "Adicionar" button is clicked
+    $('#market-btn').click(function() {
+        const selectedMarket = $('#id_market option:selected');
+        const marketText = selectedMarket.text();
+        const marketValue = selectedMarket.val();
+
+        if (marketValue !== '' && !userChoices.has(marketValue)) {
+            userChoices.add(marketValue);
+            const listItem = $('<li class="selected-stop" data-value="' + marketValue + '">' + marketText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+            $('#selected-markets').append(listItem);
+
+            // Update the hidden input fields with the selected markets
+            const selectedMarkets = Array.from(userChoices).join(',');
+            $('#id_selected_markets').val(selectedMarkets);
+            $('#id_market_type').val(selectedMarkets);
+        }
+
+        // Reset the form.market field to the first value
+        $('#id_market').val($('#id_market option:first').val());
+    });
+
+    // Remove the selected market when "X" button is clicked
+    $('#selected-markets').on('click', '.remove-stop', function() {
+        const listItem = $(this).closest('li');
+        const marketValue = listItem.data('value');
+
+        listItem.remove();
+        userChoices.delete(marketValue);
+
+        // Update the hidden input fields with the remaining selected markets
+        const selectedMarkets = Array.from(userChoices).join(',');
+        $('#id_selected_markets').val(selectedMarkets);
+        $('#id_market_type').val(selectedMarkets);
+    });
+});
+</script>
+
+

@@ -506,7 +506,12 @@ h6 {
 
 }
 
+.font-change {
+    font-family: sans-serif;
+}
+
 .text-information {
+    text-align: justify;
     margin: 0.5rem;
     font-style: italic;
     font-size: 1.7rem;

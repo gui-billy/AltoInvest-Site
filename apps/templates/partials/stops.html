@@ -1,5 +1,10 @@
 <form method="post">
     {% csrf_token %}
+    {% autoescape off %}
+    <input type="hidden" id="initial-stop-type" value="{{ stop_type }}">
+    <input type="hidden" name="selected_stops" id="id_selected_stops" value="{{ stop_type }}" />
+    {% endautoescape %}
+    <input type="hidden" name="stop_type" id="id_stop_type" value="" />
     <div class="algotrading-content list-title">
         <p style="margin-left: 0.8rem;">Selecione o sistema de &nbsp;<span class="list-title-mark">STOP-LOSS</span>&nbsp; que o Robô 
             <span class="main-logo"> {{ algo_name }}</span> irá utilizar:</p>
@@ -8,7 +13,7 @@
         <div class="select-group drop-down">
             {{ form.stops }}
         </div>
-        <button type="button" id="add-stops-btn" class="btn btn-primary">Adicionar</button>
+        <button type="button" id="stops-btn" class="btn btn-primary">Adicionar</button>
     </div>
     <div class="algotrading-content">
         <div class="text-box">
@@ -17,9 +22,15 @@
         </div>
     </div>
     <div class="algotrading-content">
-        <ul id="selected-stops" class="selected-stop">
-            <!-- Selected stops will be displayed here -->
-        </ul>
+        <ul id="selected-stops" class="selected-stop font-change">
+            {% for stop in selected_stops %}
+                {% if stop and stop != '' %}
+                    <li class="selected-stop" data-value="{{ stop }}">
+                        {{ stop }} <button class="btn-sm btn-danger remove-stop">X</button>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>        
     </div>    
 </form>
 
@@ -68,11 +79,37 @@
         // hide custom field initially
         $('#id_custom_stop').hide();
         $('#custom-stop-label').hide();
+    
+        let initialStops = JSON.parse('{{ stop_type|safe }}')
+            .filter(stop => stop && stop.trim() !== '');
+        let userChoices = new Set(initialStops);
+    
+        function appendStop(stopValue, stopText) {
+            const listItem = $('<li class="selected-stop" data-value="' + stopValue + '">' + stopText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+            $('#selected-stops').append(listItem);
+        }
+    
+        // Initialize the list of selected stops
+        userChoices.forEach(function(stopValue) {
+            if (stopValue) {
+                let stopText;
+                const predefinedStops = ['Pontos', 'Financeiro', 'Variação (%)'];
+                if (predefinedStops.includes(stopValue)) {
+                    stopText = $('#id_stops option[value="' + stopValue + '"]').text();
+                } else {
+                    stopText = stopValue;
+                }
+                appendStop(stopValue, stopText);
+            }
+        });
 
-        let userChoices = new Set();
+        // Update the hidden input fields with the initial values
+        const initialSelectedStops = Array.from(userChoices).join(',');
+        $('#id_selected_stops').val(initialSelectedStops);
+        $('#id_stop_type').val(initialSelectedStops);
 
         // Add the selected stop when "Adicionar" button is clicked
-        $('#add-stops-btn').click(function() {
+        $('#stops-btn').click(function() {
             const selectedStop = $('#id_stops option:selected');
             const stopText = selectedStop.text();
             const stopValue = selectedStop.val();
@@ -96,20 +133,28 @@
             // Hide the custom field if it was previously shown
             $('#id_custom_stop').hide();
             $('#custom-stop-label').hide();
+
+            // Update the hidden input fields with the selected stops
+            const selectedStops = Array.from(userChoices).join(',');
+            $('#id_selected_stops').val(selectedStops);
+            $('#id_stop_type').val(selectedStops);
         });
 
-        // Handle the click event for the "X" button to remove items from the list
-        $(document).on('click', '.remove-stop', function() {
+        // Remove the selected stop when "X" button is clicked
+        $('#selected-stops').on('click', '.remove-stop', function() {
             const listItem = $(this).closest('li');
-            const stopValue = listItem.attr('data-value');
-            userChoices.delete(stopValue);
-            listItem.remove();
+            const stopValue = listItem.data('value');
 
-            // Update the stoploss field with the updated comma-separated string of the user's choices
-            $('#id_stoploss').val(Array.from(userChoices).join(','));
+            listItem.remove();
+            userChoices.delete(stopValue);
+
+            // Update the hidden input fields with the remaining selected stops
+            const selectedStops = Array.from(userChoices).join(',');
+            $('#id_selected_stops').val(selectedStops);
+            $('#id_stop_type').val(selectedStops);
         });
 
-        // show custom field when "Personalizado" is selected
+        // Show custom field when "Personalizado" is selected
         $('#id_stops').change(function() {
             if ($(this).val() == 'Personalizado') {
                 $('#id_custom_stop').show();
@@ -121,3 +166,4 @@
         });
     });
 </script>
+        

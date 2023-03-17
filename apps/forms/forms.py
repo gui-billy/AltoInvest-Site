@@ -12,6 +12,8 @@ class PlatformForm(forms.Form):
         ('Binance', 'Binance'),
     )
     platform = forms.ChoiceField(choices=platform_choices)
+    selected_platforms = forms.CharField(
+        widget=forms.HiddenInput(), required=False)
 
 
 class MarketForm(forms.Form):
@@ -21,6 +23,8 @@ class MarketForm(forms.Form):
         ('Forex', 'Forex'),
     )
     market = forms.ChoiceField(choices=market_choices)
+    selected_markets = forms.CharField(
+        widget=forms.HiddenInput(), required=False)
 
 
 class StopsForm(forms.Form):
@@ -37,6 +41,8 @@ class StopsForm(forms.Form):
                'placeholder':
                'Ex.: Sistema de Stop utilizando um '
                'multiplicador do indicador ATR.'}))
+    selected_stops = forms.CharField(
+        widget=forms.HiddenInput(), required=False)
 
 
 class GainForm(forms.Form):

@@ -1,16 +1,129 @@
 <form method="post">
-
-    {% csrf_token %}
-    <div class="algotrading-content">
-      <p>Escolha a Plataforma que o robô irá ser utilizado:</p>
-    </div>
-
-    <div class="algotrading-content">
-        <div>            
-          <p class="list-text">Plataforma: </p> 
-        </div> 
-        <div class="list-group drop-down">            
+  {% csrf_token %}  
+  {% autoescape off %}
+  <input type="hidden" id="initial-platform-name" value="{{ platform_name }}">  
+  <input type="hidden" name="selected_platforms" id="id_selected_platforms" value="{{ platform_name }}" /> 
+  {% endautoescape %} 
+  <input type="hidden" name="platform_name" id="id_platform_name" value="" />
+  <div class="algotrading-content list-title">
+      <p style="margin-left: 0.8rem;">Selecione a &nbsp;<span class="list-title-mark">Plataforma</span>&nbsp; que o Robô 
+          <span class="main-logo"> {{ algo_name }}</span> irá realizar suas operações:</p>
+  </div>
+  <div class="algotrading-content">
+      <div class="select-group drop-down">
           {{ form.platform }}
-        </div>        
-    </div>   
+      </div>
+      <button type="button" id="platform-btn" class="btn btn-primary">Adicionar</button>
+  </div>  
+  <div class="algotrading-content">
+    <ul id="selected-platforms" class="selected-stop font-change">
+        {% for platform in selected_platforms %}
+            {% if platform and platform != '' %}
+                <li class="selected-stop" data-value="{{ platform }}">
+                    {{ platform }} <button class="btn-sm btn-danger remove-stop">X</button>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+  </div>  
 </form>
+
+<div class="algotrading-content">
+  <button type="button" id="info-btn" class="info-buttom">Mais Informações</button>
+</div>
+<div class="algotrading-content" id="info-content" style="display:none;">
+  <div class="help-text-algo">
+      <div class="text-information"><span style="font-weight: bold;">
+          MetaTrader5</span> - é uma plataforma de negociação avançada para ativos financeiros como Forex, ações e futuros. 
+          Oferece análise técnica, uso de robôs de negociação, backtesting e indicadores personalizados. 
+          Efetua operações rápidas com precisão, versatilidade e suporte a múltiplos mercados.</div>
+      <hr>
+      <div class="text-information"><span style="font-weight: bold;">
+          Profitchart</span> - é uma plataforma de negociação para ativos financeiros como ações e futuros. 
+          Disponibiliza de gráficos avançados, análise técnica, tape reading. Ainda possui interface personalizável, 
+          de fácil utilização e rapidez.</div> 
+      <hr>
+      <div class="text-information"><span style="font-weight: bold;">
+          Binance</span> - é uma das maiores corretoras de criptomoedas do mundo. Oferece negociação de múltiplas criptos, 
+          futuros e opções. Possui interface intuitiva e alta liquidez, além de taxas baixas, segurança, 
+          variedade de ativos e programas de recompensa.</div>       
+  </div>
+</div>
+
+<script>
+  // Add JavaScript code to handle the "Mais Informações" and "Menos Informações" button
+  $(document).ready(function() {
+      $('#info-btn').click(function() {
+          if ($('#info-content').is(':visible')) {
+              $('#info-content').hide();
+              $(this).text('Mais Informações');
+          } else {
+              $('#info-content').show();
+              $(this).text('Menos Informações');
+          }
+      });
+  });
+</script>
+
+<script>
+    $(document).ready(function() {    
+        let initialPlatforms = JSON.parse('{{ platform_name|safe }}')
+            .filter(platform => platform && platform.trim() !== '');
+        let userChoices = new Set(initialPlatforms);
+  
+        // Initialize the list of selected platforms
+        userChoices.forEach(function(platformValue) {
+            if (platformValue) {
+                const platformText = $('#id_platform option[value="' + platformValue + '"]').text();
+                const listItem = $('<li class="selected-stop" data-value="' + platformValue + '">' + platformText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+                $('#selected-platforms').append(listItem);
+            }
+        });
+  
+        // Update the hidden input fields with the initial values
+        const initialSelectedPlatforms = Array.from(userChoices).join(',');
+        $('#id_selected_platforms').val(initialSelectedPlatforms);
+        $('#id_platform_name').val(initialSelectedPlatforms);
+  
+        // Add the selected platform when "Adicionar" button is clicked
+        $('#platform-btn').click(function() {
+          const selectedPlatform = $('#id_platform option:selected');
+          const platformText = selectedPlatform.text();
+          const platformValue = selectedPlatform.val();          
+  
+          if (platformValue === 'ProfitChart' || platformValue === 'Binance') {
+            alert('Esta plataforma está indisponível no momento, por favor selecione outra.');
+            return;
+            }
+
+          if (platformValue !== '' && !userChoices.has(platformValue)) {
+              userChoices.add(platformValue);
+              const listItem = $('<li class="selected-stop" data-value="' + platformValue + '">' + platformText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+              $('#selected-platforms').append(listItem);
+  
+              // Update the hidden input fields with the selected platforms
+              const selectedPlatforms = Array.from(userChoices).join(',');
+              $('#id_selected_platforms').val(selectedPlatforms);
+              $('#id_platform_name').val(selectedPlatforms);
+          }
+          
+
+          // Reset the form.platform field to the first value
+          $('#id_platform').val($('#id_platform option:first').val());
+      });
+
+      // Handle the click event for the "X" button to remove items from the list
+      $('#selected-platforms').on('click', '.remove-stop', function() {
+          const listItem = $(this).closest('li');
+          const platformValue = listItem.data('value'); 
+
+          listItem.remove();
+          userChoices.delete(platformValue);
+
+          // Update the platform field with the updated comma-separated string of the user's choices
+          const selectedPlatforms = Array.from(userChoices).join(',');
+          $('#id_selected_platforms').val(selectedPlatforms);
+          $('#id_platform_name').val(selectedPlatforms);
+      }); 
+  });
+  </script>

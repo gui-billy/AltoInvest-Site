@@ -1,4 +1,4 @@
-<form method="post">
+<form id="name-form" method="post">
   {% csrf_token %}
   <div>
     <div class="algotrading-content">
@@ -22,8 +22,29 @@
         <input type="text" name="algo_name" placeholder="Ex.: Cruzamento de médias" value="{{ algo_name }}">           
       </div>
       <div class="request-button">
-        <button class="form-group-button" type="submit" name="submit">Iniciar</button> 
+        <button id="iniciar-btn" class="form-group-button" type="submit" name="submit">Iniciar</button> 
       </div>                   
     </div>  
   </div>
 </form>
+
+<script>
+  $(document).ready(function() {
+    function submitFormWithCounter(counter) {
+      // Update the URL with the new counter value
+      window.history.replaceState(null, null, `?counter=${counter}`);
+      
+      // Submit the form as a POST request
+      $("#name-form").submit();
+    }
+
+    // Handle the next button click event
+    $("#iniciar-btn").click(function() {
+      const currentCounter = {{ counter }};
+      const newCounter = currentCounter + 1;
+      submitFormWithCounter(newCounter);
+    });
+    
+  });
+</script>
+

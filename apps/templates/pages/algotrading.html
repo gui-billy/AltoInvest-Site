@@ -2,26 +2,68 @@
 {% load static %}
 
 {% block title %}
-  {{ robot_name }}
+  {{ algo_name }}
 {% endblock title %}
 
 {% block content %}  
-    <form id="algotrading-form" method="POST">      
-      {% csrf_token %} 
-      {% include partial_template %}      
-      <div class="request">
-        {% if counter > 0 and counter < num_templates %}
-          <div class="center">
-            <a href="?counter={{ counter|add:-1 }}"><button class="fa-solid fa-circle-chevron-left previous-button" type="button"></button></a>
-            <a href="?counter={{ counter|add:1 }}"><button class="fa-solid fa-circle-chevron-right next-button" type="button"></button></a>  
-          </div>
-        {% endif %}     
-        {% if counter == num_templates %}
-          <div class="center">
-            <a href="?counter={{ counter|add:-1 }}"><button class="fa-solid fa-circle-chevron-left previous-button" type="button"></button></a>                   
-            <a href="?counter={{ counter|add:1 }}"><button class="form-group-button" type="button">Enviar</button></a> 
-          </div>        
-        {% endif %}      
-      </div>     
-    </form>  
+<form id="algotrading-form" method="POST">      
+  {% csrf_token %}     
+  <input type="hidden" name="counter" value="{{ counter }}" />
+  <input type="hidden" name="direction" id="direction" value="next" /> <!-- Add this hidden input field -->
+  {% include partial_template %} 
+  <div class="request">
+      {% if counter > 0 and counter < num_templates %}
+      <div class="center">
+          <button id="previous-button" class="fa-solid fa-circle-chevron-left previous-button" type="submit" onclick="document.getElementById('direction').value='previous';"></button>
+          <button id="next-button" class="fa-solid fa-circle-chevron-right next-button" type="submit" onclick="document.getElementById('direction').value='next';"></button>
+      </div>
+      {% endif %}     
+      {% if counter == num_templates %}
+      <div class="center">
+        <button id="previous-button" class="fa-solid fa-circle-chevron-left previous-button" type="submit" onclick="document.getElementById('direction').value='previous';"></button>                   
+          <a href="?counter={{ counter|add:1 }}"><button class="form-group-button" type="button">Enviar</button></a> 
+      </div>        
+      {% endif %}      
+  </div>     
+</form>
+
+<p id="summary">Name: {{ algo_name }} | Platform: {{ platform_name }} | Market: | Stop: {{ stop_type }}</p>
+
+<script>  
+  const marketType = JSON.parse('{{ market_type|safe }}');
+
+  const summaryElem = document.getElementById('summary');  
+  if (marketType.length > 0) {
+    const marketTypeText = marketType.join(', ');
+    summaryElem.innerHTML += 'Market: ' + marketTypeText;
+  }
+</script>
+
+
+<script>
+  $(document).ready(function() {
+    function submitFormWithDirection(direction) {
+      // Update the hidden input field with the selected direction
+      $('#direction').val(direction);
+
+      // Update the URL with the new counter value
+      const currentCounter = {{ counter }};
+      const newCounter = direction === 'next' ? currentCounter + 1 : currentCounter - 1;
+      window.history.replaceState(null, null, `?counter=${newCounter}`);
+
+      // Submit the form as a POST request
+      $("#algotrading-form").submit();
+    }
+
+    // Handle the next button click event
+    $("#next-button").click(function() {
+      submitFormWithDirection('next');
+    });
+
+    // Handle the previous button click event
+    $("#previous-button").click(function() {
+      submitFormWithDirection('previous');
+    });
+  });
+</script>
 {% endblock content %}
