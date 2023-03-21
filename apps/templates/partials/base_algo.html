@@ -1,5 +1,6 @@
 <form id="name-form" method="post">
-  {% csrf_token %}
+  {% csrf_token %}  
+  <input type="hidden" name="counter" value="{{ counter }}" />
   <div>
     <div class="algotrading-content">
       <p class="submain-text">CRIE O SEU ROBÔ ALGOTRADING</p>
@@ -33,18 +34,25 @@
     function submitFormWithCounter(counter) {
       // Update the URL with the new counter value
       window.history.replaceState(null, null, `?counter=${counter}`);
-      
+
+      // Update the hidden counter input field value
+      $('input[name="counter"]').val(counter);
+
       // Submit the form as a POST request
       $("#name-form").submit();
     }
 
-    // Handle the next button click event
-    $("#iniciar-btn").click(function() {
+    // Handle the form submit event
+    $("#name-form").on('submit', function(e) {
+      e.preventDefault(); // Prevent the default form submission
+
       const currentCounter = {{ counter }};
       const newCounter = currentCounter + 1;
+
       submitFormWithCounter(newCounter);
     });
-    
   });
 </script>
+
+
 

@@ -1,0 +1,71 @@
+<form method="post">
+  {% csrf_token %}
+</form>
+
+<div class="algotrading-content-gray">
+  <div class="main-title">
+    {% comment %} <h1>{{ algo_name }}</h1> {% endcomment %}
+  </div>
+  <div class="center">
+    <div id="output"></div>
+  </div>
+  
+</div>
+
+
+<script>
+  const sessionDataJson = '{{ session_data_json|escapejs }}';
+  const sessionData = JSON.parse(sessionDataJson);
+
+  const keysJson = '{{ keys_json|escapejs }}';
+  const keys = JSON.parse(keysJson);
+
+  function displayData() {
+    const output = document.getElementById('output');
+    let html = '<table class="tab-content">';
+
+    for (const [index, [variableName, values]] of sessionData.entries()) {
+      // Add 'selected_' prefix for variables other than 'algo_name'
+      const keyName = variableName === 'algo_name' ? variableName : 'selected_' + variableName;
+      const keyObj = keys.find(k => k.name === keyName);
+
+      if (!keyObj) {
+        continue;
+      }
+
+      const label = keyObj.label;
+      if(variableName === 'algo_name') {
+        html += `<td></td>`;
+      }
+      else {
+        html += `<tr class="line-border"><td class="tab-label"><b>${label}:</b></td>`;
+      }
+      
+      
+      // If values is a string, parse it as JSON; otherwise, treat it as a single item list
+      const valuesList = variableName === 'algo_name' ? [values] : JSON.parse(values);
+
+      count = 0;  
+      for (const value of valuesList) {
+        if((count>0) && (count%2==0)){
+          html += `<tr><td></td><td class="apply-tab">${value}</td>`;          
+        }
+        else {
+          html += `<td class="apply-tab">${value}</td>`;
+        }        
+      count += 1;
+      }
+      
+      html += `</tr>`;
+    }
+
+    html += '</table>';
+    output.innerHTML = html;
+  }
+
+  displayData();
+</script>
+
+
+
+

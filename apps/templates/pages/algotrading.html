@@ -11,34 +11,24 @@
   <input type="hidden" name="counter" value="{{ counter }}" />
   <input type="hidden" name="direction" id="direction" value="next" /> <!-- Add this hidden input field -->
   {% include partial_template %} 
-  <div class="request">
-      {% if counter > 0 and counter < num_templates %}
-      <div class="center">
+    {% if counter > 0 and counter < num_templates %}
+      <div class=" request center">
           <button id="previous-button" class="fa-solid fa-circle-chevron-left previous-button" type="submit" onclick="document.getElementById('direction').value='previous';"></button>
           <button id="next-button" class="fa-solid fa-circle-chevron-right next-button" type="submit" onclick="document.getElementById('direction').value='next';"></button>
       </div>
-      {% endif %}     
-      {% if counter == num_templates %}
-      <div class="center">
-        <button id="previous-button" class="fa-solid fa-circle-chevron-left previous-button" type="submit" onclick="document.getElementById('direction').value='previous';"></button>                   
-          <a href="?counter={{ counter|add:1 }}"><button class="form-group-button" type="button">Enviar</button></a> 
-      </div>        
-      {% endif %}      
-  </div>     
+      {% endif %}    
+         
+    
+  {% if counter == num_templates %}
+    <div class="center apply-btns">
+      <button id="previous-button" class="fa-solid fa-circle-chevron-left apply-previous-btn" type="submit" onclick="document.getElementById('direction').value='previous';"></button>                   
+      <button class="apply-button" type="button" id="enviar-button">Solicitar Orçamento</button>
+    </div>        
+  {% endif %}   
 </form>
 
-<p id="summary">Name: {{ algo_name }} | Platform: {{ platform_name }} | Market: | Stop: {{ stop_type }}</p>
-
-<script>  
-  const marketType = JSON.parse('{{ market_type|safe }}');
-
-  const summaryElem = document.getElementById('summary');  
-  if (marketType.length > 0) {
-    const marketTypeText = marketType.join(', ');
-    summaryElem.innerHTML += 'Market: ' + marketTypeText;
-  }
-</script>
-
+{% comment %} <p>Name: {{ algo_name }} | Platform: {{ platform_name }} | Market: {{ market_type }} 
+  | Stop: {{ stop_type }} | Gain: {{ gain_type }} | Ordem: {{ order_type }} | Horario: {{ hour_type }}</p> {% endcomment %}
 
 <script>
   $(document).ready(function() {
@@ -63,6 +53,21 @@
     // Handle the previous button click event
     $("#previous-button").click(function() {
       submitFormWithDirection('previous');
+    });
+  
+    // Handle the Enviar button click event
+    $("#enviar-button").click(function() {
+      // Reset the counter value to 0
+      const newCounter = 0;
+      const counter = 0;
+
+      $("input[name='counter']").val(newCounter);
+
+      // Update the URL with the new counter value
+      window.history.replaceState(null, null, `?counter=${newCounter}`);
+
+      // Submit the form as a POST request
+      $("#algotrading-form").submit();
     });
   });
 </script>

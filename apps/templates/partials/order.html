@@ -1,0 +1,153 @@
+<form method="post">
+    {% csrf_token %}
+    {% autoescape off %}
+    <input type="hidden" id="initial-order-type" value="{{ order_type }}">
+    <input type="hidden" name="selected_orders" id="id_selected_orders" value="{{ order_type }}" />
+    {% endautoescape %}
+    <input type="hidden" name="order_type" id="id_order_type" value="" />
+    <div class="algotrading-content list-title">
+        <p style="margin-left: 0.8rem;">Selecione o sistema de &nbsp;<span class="list-title-mark">ORDENS</span>&nbsp; que o Robô 
+            <span class="main-logo"> {{ algo_name }}</span> irá utilizar:</p>
+    </div>
+    <div class="algotrading-content">
+        <div class="select-group drop-down">
+            {{ form.orders }}
+        </div>
+        <button type="button" id="orders-btn" class="btn btn-primary">Adicionar</button>
+    </div>    
+    <div class="algotrading-content">
+        <ul id="selected-orders" class="selected-stop font-change">
+            {% for order in selected_orders %}
+                {% if order and order != '' %}
+                    <li class="selected-stop" data-value="{{ order }}">
+                        {{ order }} <button class="btn-sm btn-danger remove-stop">X</button>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>        
+    </div>    
+    <div class="algotrading-content">
+        <div class="text-box">
+            <label id="custom-order-label" for="{{ form.custom_order.id_for_label }}" class="details">Detalhes do funcionamento:</label>
+            {{ form.custom_order }}
+        </div>
+    </div>
+</form>
+
+<div class="algotrading-content">
+    <button type="button" id="info-btn" class="info-buttom">Mais Informações</button>
+</div>
+<div class="algotrading-content" id="info-content" style="display:none;">
+    <div class="help-text-algo">
+        <div class="text-information"><span style="font-weight: bold;">
+            Ordem a Mercado:</span> Executada imediatamente pelo melhor preço disponível no momento. 
+            Garante a execução da ordem, porém não assegura um preço específico.</div>
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Ordem Limitada:</span> Estabelece um preço máximo para compra ou mínimo para venda. 
+            A ordem só é executada se o mercado atingir o valor estipulado, controlando assim o preço desejado.</div> 
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Ordem Stop:</span> Aciona uma ordem a mercado ou limitada quando o preço predefinido é alcançado. 
+            Utilizada para proteger o investidor contra perdas significativas ou garantir a realização de lucros.</div>  
+    </div>
+</div>
+
+<script>
+    // Add JavaScript code to handle the "Mais Informações" and "Menos Informações" button
+    $(document).ready(function() {
+        $('#info-btn').click(function() {
+            if ($('#info-content').is(':visible')) {
+                $('#info-content').hide();
+                $(this).text('Mais Informações');
+            } else {
+                $('#info-content').show();
+                $(this).text('Menos Informações');
+            }
+        });
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(function() {
+        // show custom_order field initially
+        $('#custom-order-label').show();
+        $('#id_custom_order').show();
+    
+        let initialOrders = JSON.parse('{{ order_type|safe }}')
+            .filter(order => order && order.trim() !== '');
+        let userChoices = new Set(initialOrders);
+    
+        function appendOrder(orderValue, orderText) {
+            const listItem = $('<li class="selected-stop" data-value="' + orderValue + '">' + orderText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+            $('#selected-orders').append(listItem);
+        }
+    
+        // Initialize the list of selected stops
+        userChoices.forEach(function(orderValue) {
+            if (orderValue) {
+                let orderText;
+                const predefinedOrders = ['A Mercado', 'Limit', 'Stop'];
+                if (predefinedOrders.includes(orderValue)) {
+                    orderText = $('#id_orders option[value="' + orderValue + '"]').text();
+                } else {
+                    orderText = orderValue;
+                }
+                appendOrder(orderValue, orderText);
+            }
+        });
+    
+        // Update the hidden input fields with the initial values
+        const initialSelectedOrders = Array.from(userChoices).join(',');
+        $('#id_selected_orders').val(initialSelectedOrders);
+        $('#id_order_type').val(initialSelectedOrders);
+    
+        // Add the selected stop when "Adicionar" button is clicked
+        $('#orders-btn').click(function() {
+            const selectedOrder = $('#id_orders option:selected');
+            const orderText = selectedOrder.text();
+            const orderValue = selectedOrder.val();
+
+            const customValue = $('#id_custom_order').val().trim();
+
+            // Combine the orderValue and customValue with a dash
+            const combinedValue = orderValue + (customValue !== '' ? ' - ' + customValue : '');
+            const combinedText = orderText + (customValue !== '' ? ' - ' + customValue : '');
+
+            // Add the combined order value to the list
+            if (combinedValue !== '' && !userChoices.has(combinedValue)) {
+                userChoices.add(combinedValue);
+                appendOrder(combinedValue, combinedText);
+
+                // Update the hidden input fields with the selected stops
+                const selectedOrders = Array.from(userChoices).join(',');
+                $('#id_selected_orders').val(selectedOrders);
+                $('#id_order_type').val(selectedOrders);
+            }
+
+            // Reset the form.stops field to the first value
+            $('#id_orders').val($('#id_orders option:first').val());
+            $('#id_custom_order').val(''); // Clear the custom value field
+        });
+
+
+    
+        // Remove the selected stop when "X" button is clicked
+        $('#selected-orders').on('click', '.remove-stop', function() {
+            const listItem = $(this).closest('li');
+            const orderValue = listItem.data('value');
+    
+            listItem.remove();
+            userChoices.delete(orderValue);
+    
+            // Update the hidden input fields with the remaining selected stops
+            const selectedOrders = Array.from(userChoices).join(',');
+            $('#id_selected_orders').val(selectedOrders);
+            $('#id_order_type').val(selectedOrders);
+        });
+    });
+    
+</script>
+        

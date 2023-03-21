@@ -1,5 +1,10 @@
 <form method="post">
-  {% csrf_token %}
+    {% csrf_token %}
+    {% autoescape off %}
+    <input type="hidden" id="initial-gain-type" value="{{ gain_type }}">
+    <input type="hidden" name="selected_gains" id="id_selected_gains" value="{{ gain_type }}" />
+    {% endautoescape %}
+    <input type="hidden" name="gain_type" id="id_gain_type" value="" />
   <div class="algotrading-content list-title">
       <p style="margin-left: 0.8rem;">Selecione o sistema de &nbsp;<span class="list-title-mark">STOP-GAIN</span>&nbsp; que o Robô 
         <span class="main-logo"> {{ algo_name }}</span> irá utilizar:</p>
@@ -8,7 +13,7 @@
       <div class="select-group drop-down">
           {{ form.gains }}
       </div>
-      <button type="button" id="add-gains-btn" class="btn btn-primary">Adicionar</button>
+      <button type="button" id="gains-btn" class="btn btn-primary">Adicionar</button>
   </div>
   <div class="algotrading-content">
       <div class="text-box">
@@ -17,10 +22,16 @@
       </div>
   </div>
   <div class="algotrading-content">
-      <ul id="selected-gains" class="selected-stop">
-          <!-- Selected gains will be displayed here -->
-      </ul>
-  </div>    
+    <ul id="selected-gains" class="selected-stop font-change">
+        {% for gain in selected_gains %}
+            {% if gain and gain != '' %}
+                <li class="selected-stop" data-value="{{ gain }}">
+                    {{ gain }} <button class="btn-sm btn-danger remove-stop">X</button>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+  </div>   
 </form>
 
 <div class="algotrading-content">
@@ -63,60 +74,102 @@
 </script>
 
 <script>
-  $(document).ready(function() {
-    // hide custom field initially
-    $('#id_custom_gain').hide();
-    $('#custom-gain-label').hide();
-
-    let userChoices = new Set();
-
-    // Add the selected gain when "Adicionar" button is clicked
-    $('#add-gains-btn').click(function() {
-        const selectedGain = $('#id_gains option:selected');
-        const gainText = selectedGain.text();
-        const gainValue = selectedGain.val();
-
-        if (gainValue === 'Personalizado') {
-            const customValue = $('#id_custom_gain').val().trim();
-            if (customValue !== '' && !userChoices.has(customValue)) {
-                userChoices.add(customValue);
-                const listItem = $('<li class="selected-gain" data-value="' + customValue + '">' + customValue + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
-                $('#selected-gains').append(listItem);
-            }
-        } else if (gainValue !== '' && !userChoices.has(gainValue)) {
-            userChoices.add(gainValue);
-            const listItem = $('<li class="selected-gain" data-value="' + gainValue + '">' + gainText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
-            $('#selected-gains').append(listItem);
-        }
-
-        // Reset the form.gains field to the first value
-        $('#id_gains').val($('#id_gains option:first').val());
-
-        // Hide the custom field if it was previously shown
+    $(document).ready(function() {
+        // hide custom field initially
         $('#id_custom_gain').hide();
         $('#custom-gain-label').hide();
-    });
-
-    // Handle the click event for the "X" button to remove items from the list
-    $(document).on('click', '.remove-stop', function() {
-        const listItem = $(this).closest('li');
-        const gainValue = listItem.attr('data-value');
-        userChoices.delete(gainValue);
-        listItem.remove();
-
-        // Update the stopgain field with the updated comma-separated string of the user's choices
-        $('#id_stopgain').val(Array.from(userChoices).join(','));
-    });
     
-    // show custom field when "Personalizado" is selected
-    $('#id_gains').change(function() {
-      if ($(this).val() == 'Personalizado') {
-          $('#id_custom_gain').show();
-          $('#custom-gain-label').show();
-      } else {
-          $('#id_custom_gain').hide();
-          $('#custom-gain-label').hide();
-      }
-  });
-});
+        let initialGains = JSON.parse('{{ gain_type|safe }}')
+            .filter(gain => gain && gain.trim() !== '');
+        let userChoices = new Set(initialGains);
+    
+        function appendGain(gainValue, gainText) {
+            const listItem = $('<li class="selected-stop" data-value="' + gainValue + '">' + gainText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+            $('#selected-gains').append(listItem);
+        }
+    
+        // Initialize the list of selected stops
+        userChoices.forEach(function(gainValue) {
+            if (gainValue) {
+                let gainText;
+                const predefinedGains = ['Pontos', 'Financeiro', 'Variação (%)'];
+                if (predefinedGains.includes(gainValue)) {
+                    gainText = $('#id_gains option[value="' + gainValue + '"]').text();
+                } else {
+                    gainText = gainValue;
+                }
+                appendGain(gainValue, gainText);
+            }
+        });
+
+        // Update the hidden input fields with the initial values
+        const initialSelectedGains = Array.from(userChoices).join(',');
+        $('#id_selected_gains').val(initialSelectedGains);
+        $('#id_gain_type').val(initialSelectedGains);
+
+        // Add the selected stop when "Adicionar" button is clicked
+        $('#gains-btn').click(function() {
+            const selectedGain = $('#id_gains option:selected');
+            const gainText = selectedGain.text();
+            const gainValue = selectedGain.val();
+
+            if (gainValue === 'Personalizado') {
+                const customValue = $('#id_custom_gain').val().trim();
+                if (customValue !== '' && !userChoices.has(customValue)) {
+                    userChoices.add(customValue);
+                    const listItem = $('<li class="selected-stop" data-value="' + customValue + '">' + customValue + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+                    $('#selected-gains').append(listItem);
+                    
+                    // Update the hidden input fields with the selected stops
+                    const selectedGains = Array.from(userChoices).join(',');
+                    $('#id_selected_gains').val(selectedGains);
+                    $('#id_gain_type').val(selectedGains);
+                
+                }
+            } else if (gainValue !== '' && !userChoices.has(gainValue)) {
+                userChoices.add(gainValue);
+                const listItem = $('<li class="selected-stop" data-value="' + gainValue + '">' + gainText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+                $('#selected-gains').append(listItem);
+
+                // Update the hidden input fields with the selected stops
+                const selectedGains = Array.from(userChoices).join(',');
+                $('#id_selected_gains').val(selectedGains);
+                $('#id_gain_type').val(selectedGains);
+            }
+
+            // Reset the form.stops field to the first value
+            $('#id_gains').val($('#id_gains option:first').val());
+
+            // Hide the custom field if it was previously shown
+            $('#id_custom_gain').hide();
+            $('#custom-gain-label').hide();
+            
+        });
+
+        // Remove the selected stop when "X" button is clicked
+        $('#selected-gains').on('click', '.remove-stop', function() {
+            const listItem = $(this).closest('li');
+            const gainValue = listItem.data('value');
+
+            listItem.remove();
+            userChoices.delete(gainValue);
+
+            // Update the hidden input fields with the remaining selected stops
+            const selectedGains = Array.from(userChoices).join(',');
+            $('#id_selected_gains').val(selectedGains);
+            $('#id_gain_type').val(selectedGains);
+        });
+
+        // Show custom field when "Personalizado" is selected
+        $('#id_gains').change(function() {
+            if ($(this).val() == 'Personalizado') {
+                $('#id_custom_gain').show();
+                $('#custom-gain-label').show();
+            } else {
+                $('#id_custom_gain').hide();
+                $('#custom-gain-label').hide();
+            }
+        });
+
+    });
 </script>

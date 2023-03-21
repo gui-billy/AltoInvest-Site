@@ -87,7 +87,7 @@
         const marketText = selectedMarket.text();
         const marketValue = selectedMarket.val();
 
-        if (marketValue !== '' && !userChoices.has(marketValue)) {
+        if (marketValue !== '' && !userChoices.has(marketValue)) {  
             userChoices.add(marketValue);
             const listItem = $('<li class="selected-stop" data-value="' + marketValue + '">' + marketText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
             $('#selected-markets').append(listItem);

@@ -120,11 +120,22 @@
                     userChoices.add(customValue);
                     const listItem = $('<li class="selected-stop" data-value="' + customValue + '">' + customValue + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
                     $('#selected-stops').append(listItem);
+                    
+                    // Update the hidden input fields with the selected stops
+                    const selectedStops = Array.from(userChoices).join(',');
+                    $('#id_selected_stops').val(selectedStops);
+                    $('#id_stop_type').val(selectedStops);
+                
                 }
             } else if (stopValue !== '' && !userChoices.has(stopValue)) {
                 userChoices.add(stopValue);
                 const listItem = $('<li class="selected-stop" data-value="' + stopValue + '">' + stopText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
                 $('#selected-stops').append(listItem);
+
+                // Update the hidden input fields with the selected stops
+                const selectedStops = Array.from(userChoices).join(',');
+                $('#id_selected_stops').val(selectedStops);
+                $('#id_stop_type').val(selectedStops);
             }
 
             // Reset the form.stops field to the first value
@@ -133,11 +144,7 @@
             // Hide the custom field if it was previously shown
             $('#id_custom_stop').hide();
             $('#custom-stop-label').hide();
-
-            // Update the hidden input fields with the selected stops
-            const selectedStops = Array.from(userChoices).join(',');
-            $('#id_selected_stops').val(selectedStops);
-            $('#id_stop_type').val(selectedStops);
+            
         });
 
         // Remove the selected stop when "X" button is clicked
@@ -164,6 +171,7 @@
                 $('#custom-stop-label').hide();
             }
         });
+
     });
 </script>
         

@@ -1,0 +1,190 @@
+<form method="post">
+    {% csrf_token %}
+    {% autoescape off %}
+    <input type="hidden" id="initial-hour-type" value="{{ hour_type }}">
+    <input type="hidden" name="selected_hours" id="id_selected_hours" value="{{ hour_type }}" />
+    {% endautoescape %}
+    <input type="hidden" name="hour_type" id="id_hour_type" value="" />
+    <div class="algotrading-content list-title">
+        <p style="margin-left: 0.8rem;">Selecione o sistema de &nbsp;<span class="list-title-mark">HORÁRIOS</span>&nbsp; que o Robô 
+            <span class="main-logo"> {{ algo_name }}</span> irá utilizar:</p>
+    </div>
+    <div class="algotrading-content-mod">
+        <div class="select-group-mod">
+            <div class="drop-down-mod">
+                {{ form.hours }}
+                {{ form.extra_input }}
+            </div>
+            <div class="add-btn">
+                <button type="button" id="hours-btn" class="btn btn-primary">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <div class="algotrading-content">
+        <div class="text-box">
+            <label id="custom-hour-label" for="{{ form.custom_hour.id_for_label }}" class="center-label">Personalizado:</label>
+            {{ form.custom_hour }}
+        </div>
+    </div>
+    <div class="algotrading-content">
+        <ul id="selected-hours" class="selected-stop font-change">
+            {% for hour in selected_hours %}
+                {% if hour and hour != '' %}
+                    <li class="selected-stop" data-value="{{ hour }}">
+                        {{ hour }} <button class="btn-sm btn-danger remove-stop">X</button>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>        
+    </div>    
+</form>
+
+<div class="algotrading-content">
+    <button type="button" id="info-btn" class="info-buttom">Mais Informações</button>
+</div>
+<div class="algotrading-content" id="info-content" style="display:none;">
+    <div class="help-text-algo">
+        <div class="text-information"><span style="font-weight: bold;">
+            Fixo</span> - Serão determinados horários fixos para o robô algotrading operar e encerrar as operações.
+            O usuário não terá acesso posteriormente para alterar o valor.</div>
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Início</span> - Determina o horário de início em que o robô algotrading está autorizado a realizar operações. 
+            Por exemplo: Todos os dias a partir das 10h ele inicia para abrir novas posições.</div> 
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Fim</span> - Determina o horário limite em que o robô algotrading está autorizado a realizar operações. 
+            Por exemplo: Todos os dias após às 16h ele não abre novas posições.</div>
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Encerramento</span> - Determina o horário de encerramento em que o robô algotrading pode continuar com posições abertas no mercado.
+            Por exemplo: Caso exista alguma posição aberta às 17h, o robô irá fechar automaticamente.</div>
+        <hr>
+        <div class="text-information"><span style="font-weight: bold;">
+            Personalizado</span> - Determina horários conforme critérios definidos pelo usuário.</div>
+    </div>
+</div>
+
+<script>
+    // Add JavaScript code to handle the "Mais Informações" and "Menos Informações" button
+    $(document).ready(function() {
+        $('#info-btn').click(function() {
+            if ($('#info-content').is(':visible')) {
+                $('#info-content').hide();
+                $(this).text('Mais Informações');
+            } else {
+                $('#info-content').show();
+                $(this).text('Menos Informações');
+            }
+        });
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(function() {
+        // hide custom field initially
+        $('#id_custom_hour').hide();
+        $('#custom-hour-label').hide();
+    
+        let initialHours = JSON.parse('{{ hour_type|safe }}')
+            .filter(hour => hour && hour.trim() !== '');
+        let userChoices = new Set(initialHours);
+    
+        function appendHour(hourValue, hourText) {
+            const listItem = $('<li class="selected-stop" data-value="' + hourValue + '">' + hourText + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+            $('#selected-hours').append(listItem);
+        }
+    
+        // Initialize the list of selected stops
+        userChoices.forEach(function(hourValue) {
+            if (hourValue) {
+                let hourText;
+                const predefinedHours = ['Horário Fixo', 'Horário Início', 'Horário Fim', 'Horário Encerramento'];
+                if (predefinedHours.includes(hourValue)) {
+                    hourText = $('#id_hours option[value="' + hourValue + '"]').text();
+                } else {
+                    hourText = hourValue;
+                }
+                appendHour(hourValue, hourText);
+            }
+        });
+
+        // Update the hidden input fields with the initial values
+        const initialSelectedHours = Array.from(userChoices).join(',');
+        $('#id_selected_hours').val(initialSelectedHours);
+        $('#id_hour_type').val(initialSelectedHours);
+
+        // Add the selected stop when "Adicionar" button is clicked
+        $('#hours-btn').click(function() {
+            const selectedHour = $('#id_hours option:selected');
+            const hourText = selectedHour.text();
+            const hourValue = selectedHour.val();
+            const extraInputValue = $('.extra-input').val().trim();
+
+            if (hourValue === 'Personalizado') {
+                const customValue = $('#id_custom_hour').val().trim();
+                if (customValue !== '' && !userChoices.has(customValue)) {
+                    userChoices.add(customValue);
+                    const listItem = $('<li class="selected-stop" data-value="' + customValue + '">' + customValue + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+                    $('#selected-hours').append(listItem);
+                    
+                    // Update the hidden input fields with the selected stops
+                    const selectedHours = Array.from(userChoices).join(',');
+                    $('#id_selected_hours').val(selectedHours);
+                    $('#id_hour_type').val(selectedHours);
+                
+                }
+            } else if (hourValue !== '' && !userChoices.has(hourValue)) {
+                const combinedValue = hourValue + ': ' + extraInputValue;
+                userChoices.add(combinedValue);
+                const listItem = $('<li class="selected-stop" data-value="' + combinedValue + '">' + combinedValue + ' <button class="btn-sm btn-danger remove-stop">X</button></li>');
+                $('#selected-hours').append(listItem);
+
+                // Update the hidden input fields with the selected stops
+                const selectedHours = Array.from(userChoices).join(',');
+                $('#id_selected_hours').val(selectedHours);
+                $('#id_hour_type').val(selectedHours);
+            }
+
+            // Reset the form.stops field to the first value
+            $('#id_hours').val($('#id_hours option:first').val());
+
+            // Hide the custom field if it was previously shown
+            $('#id_custom_hour').hide();
+            $('#custom-hour-label').hide();
+
+            // Clear the extra input field after adding the selection
+            $('.extra-input').val('');
+
+        });
+
+        // Remove the selected stop when "X" button is clicked
+        $('#selected-hours').on('click', '.remove-stop', function() {
+            const listItem = $(this).closest('li');
+            const hourValue = listItem.data('value');
+
+            listItem.remove();
+            userChoices.delete(hourValue);
+
+            // Update the hidden input fields with the remaining selected stops
+            const selectedHours = Array.from(userChoices).join(',');
+            $('#id_selected_hours').val(selectedHours);
+            $('#id_hour_type').val(selectedHours);
+        });
+
+        // Show custom field when "Personalizado" is selected
+        $('#id_hours').change(function() {
+            if ($(this).val() == 'Personalizado') {
+                $('#id_custom_hour').show();
+                $('#custom-hour-label').show();
+            } else {
+                $('#id_custom_hour').hide();
+                $('#custom-hour-label').hide();
+            }
+        });
+
+    });
+</script>
+        
